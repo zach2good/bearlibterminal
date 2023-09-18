@@ -47,7 +47,7 @@ namespace BearLibTerminal
 		T temp;
 		return try_parse(s, temp);
 	}
-	
+
 	template<typename T, typename char_t> bool try_parse(const std::basic_string<char_t>& s, T& out, std::ios_base& (*f)(std::ios_base&))
 	{
 		std::basic_istringstream<char_t> stream(s);
@@ -180,14 +180,6 @@ namespace BearLibTerminal
 		T m_sum;
 		size_t m_count;
 	};
-}
-
-namespace std
-{
-	template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}
 }
 
 #endif /* UTILITY_HPP_ */

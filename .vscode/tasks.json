@@ -1,0 +1,33 @@
+{
+    "windows": {
+        "options": {
+            "shell": {
+            "executable": "cmd.exe",
+            "args": ["/d", "/c"]
+            }
+        }
+    },
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "CMake Build",
+            "dependsOn": [
+                "CMake Configuration"
+            ],
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/Build",
+                "-j8"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+    ],
+    "version": "2.0.0"
+}
