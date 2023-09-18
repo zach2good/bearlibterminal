@@ -370,7 +370,7 @@ namespace BearLibTerminal
 			}
 			catch (std::exception& e)
 			{
-				LOG(Error, L"Cannot open configuration file '" << m_filename << L"' for reading");
+				LOG(Error, L"Cannot open configuration file '" << m_filename << L"' for reading: " << e.what());
 				return;
 			}
 		}
@@ -571,7 +571,7 @@ namespace BearLibTerminal
 		}
 		catch (std::exception& e)
 		{
-			LOG(Error, L"Cannot open configuration file '" << m_filename << "' for writing");
+			LOG(Error, L"Cannot open configuration file '" << m_filename << "' for writing: " << e.what());
 			return;
 		}
 	}

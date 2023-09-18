@@ -1223,9 +1223,9 @@ namespace BearLibTerminal
 			// Background color
 			if (m_world.state.layer == 0 && back)
 			{
-				for (int by = y; by < std::min(y+tile_info->spacing.height, m_world.stage.size.height); by++)
+				for (int by = y; by < std::min<int>(y+tile_info->spacing.height, m_world.stage.size.height); by++)
 				{
-					for (int bx = x; bx < std::min(x+tile_info->spacing.width, m_world.stage.size.width); bx++)
+					for (int bx = x; bx < std::min<int>(x+tile_info->spacing.width, m_world.stage.size.width); bx++)
 					{
 						m_world.stage.backbuffer.background[by*m_world.stage.size.width+bx] = back;
 					}
@@ -1334,7 +1334,7 @@ namespace BearLibTerminal
 			}
 
 			size.width += symbol.spacing.width;
-			size.height = std::max(size.height, symbol.spacing.height);
+			size.height = std::max<int>(size.height, symbol.spacing.height);
 		}
 	}
 
@@ -1411,7 +1411,7 @@ namespace BearLibTerminal
 				}
 
 				size_t params_pos = str.find(L'=', i);
-				params_pos = std::min(closing_bracket_pos, (params_pos == std::wstring::npos)? str.length(): params_pos);
+				params_pos = std::min<std::size_t>(closing_bracket_pos, (params_pos == std::wstring::npos)? str.length(): params_pos);
 
 				std::wstring name = str.substr(i, params_pos-i);
 				std::wstring params = (params_pos < closing_bracket_pos)? str.substr(params_pos+1, closing_bracket_pos-(params_pos+1)): std::wstring();
@@ -1582,7 +1582,7 @@ namespace BearLibTerminal
 		{
 			line.UpdateSize();
 			total_height += line.size.height;
-			total_width = std::max(total_width, line.size.width);
+			total_width = std::max<int>(total_width, line.size.width);
 		}
 
 		int horizontal_align = (align & 3);
@@ -1596,7 +1596,7 @@ namespace BearLibTerminal
 			}
 			else if ((vertical_align & TK_ALIGN_BOTTOM) == TK_ALIGN_BOTTOM)
 			{
-				y = y0 + std::max(wrap.height, 1) - total_height;
+				y = y0 + std::max<int>(wrap.height, 1) - total_height;
 			}
 			else // TK_ALIGN_TOP or default
 			{
@@ -1618,7 +1618,7 @@ namespace BearLibTerminal
 					}
 					else if ((horizontal_align & TK_ALIGN_RIGHT) == TK_ALIGN_RIGHT)
 					{
-						x = x0 + std::max(wrap.width, 1) - line.size.width;
+						x = x0 + std::max<int>(wrap.width, 1) - line.size.width;
 					}
 					else // TK_ALIGN_LEFT or default
 					{
@@ -1649,7 +1649,7 @@ namespace BearLibTerminal
 		}
 
 		if (wrap.height)
-			total_height = std::min(total_height, wrap.height);
+			total_height = std::min<int>(total_height, wrap.height);
 		return Size{total_width, total_height};
 	}
 
@@ -1725,7 +1725,7 @@ namespace BearLibTerminal
 	{
 		CHECK_THREAD("read", TK_CLOSE);
 
-		return ReadEvent(std::numeric_limits<int>::max()).code;
+		return ReadEvent(INT_MAX).code;
 	}
 
 	int Terminal::Peek()
@@ -1774,7 +1774,7 @@ namespace BearLibTerminal
 			return 0;
 		}
 
-		max = std::min(max, m_world.stage.size.width-x);
+		max = std::min<int>(max, m_world.stage.size.width-x);
 		for (int i=0; i<max; i++)
 		{
 			Layer& layer = m_world.stage.backbuffer.layers[m_world.state.layer];
@@ -1811,7 +1811,7 @@ namespace BearLibTerminal
 			Refresh();
 
 			int blink_rate = m_options.input_cursor_blink_rate;
-			auto event = ReadEvent(blink_rate? blink_rate: std::numeric_limits<int>::max());
+			auto event = ReadEvent(blink_rate? blink_rate : INT_MAX);
 
 			if (event.code == TK_INPUT_NONE)
 			{
@@ -1865,9 +1865,14 @@ namespace BearLibTerminal
 			int pumped = m_window->PumpEvents();
 			auto left = until - std::chrono::system_clock::now();
 			if (left <= std::chrono::system_clock::duration::zero())
+			{
 				break;
+			}
+
 			if (!pumped)
-				std::this_thread::sleep_for(std::min(step, left));
+			{
+				std::this_thread::sleep_for(std::min<std::chrono::system_clock::duration>(step, left));
+			}
 		}
 	}
 
