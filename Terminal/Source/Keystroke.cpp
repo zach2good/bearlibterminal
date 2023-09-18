@@ -20,7 +20,6 @@
 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#define BEARLIBTERMINAL_BUILDING_LIBRARY
 #include "BearLibTerminal.h"
 #include "Keystroke.hpp"
 #include <stdexcept>

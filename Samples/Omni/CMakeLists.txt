@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.20)
 
 if (UNIX AND NOT APPLE)
 	set(LINUX TRUE)
@@ -6,24 +6,20 @@ endif()
 
 project(SampleOmni)
 
+set_property(GLOBAL PROPERTY CXX_STANDARD 17)
+set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(GLOBAL PROPERTY CXX_EXTENSIONS ON)
+set_property(GLOBAL PROPERTY LINKER_LANGUAGE CXX)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(CMAKE_SKIP_RPATH TRUE)
 
 # Detect system bitness
 math(EXPR BITNESS "8*${CMAKE_SIZEOF_VOID_P}")
 
-# Release flags
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g0")
-if(NOT APPLE)
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
-endif()
-
-# Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
-
 # Common flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 if(WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -mwindows")
+	# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -mwindows")
 elseif(LINUX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
 endif()
@@ -57,13 +53,21 @@ set(HEADER_FILES ./Source/Common.hpp)
 
 include_directories(${CMAKE_SOURCE_DIR}/Terminal/Include/C)
 add_executable(SampleOmni ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(SampleOmni BearLibTerminal)
+target_link_libraries(SampleOmni PUBLIC BearLibTerminal)
 if (LINUX)
-    target_link_libraries(SampleOmni -Wl,-R.)
+    target_link_libraries(SampleOmni PUBLIC -Wl,-R.)
 endif()
 if(WIN32)
-	target_link_libraries(SampleOmni winmm.lib)
+	target_link_libraries(SampleOmni PUBLIC winmm.lib)
 endif()
+
+set(MSVC_WARNINGS
+    # /W4 # Baseline reasonable warnings
+    /wd4267
+    /wd4244
+	/wd4066
+)
+target_compile_options(SampleOmni PUBLIC ${MSVC_WARNINGS})
 
 set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/Output/${CMAKE_SYSTEM_NAME}${BITNESS})
 set_target_properties(SampleOmni PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})

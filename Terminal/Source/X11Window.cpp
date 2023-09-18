@@ -37,7 +37,6 @@
 #include <X11/Xatom.h>
 #include <poll.h>
 
-#define BEARLIBTERMINAL_BUILDING_LIBRARY
 #include "BearLibTerminal.h"
 
 // X11 hack because X.h #defines these names without any regards to others

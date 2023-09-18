@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.20)
 
 include(GNUInstallDirs)
 
@@ -6,7 +6,13 @@ if (UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 endif()
 
-option(BUILD_SHARED_LIBS "Build dynamic version of library" ON)
+set_property(GLOBAL PROPERTY CXX_STANDARD 17)
+set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(GLOBAL PROPERTY CXX_EXTENSIONS ON)
+set_property(GLOBAL PROPERTY LINKER_LANGUAGE CXX)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+option(BUILD_SHARED_LIBS "Build dynamic version of library" OFF)
 
 add_subdirectory(Dependencies/FreeType)
 add_subdirectory(Dependencies/PicoPNG)
@@ -31,26 +37,15 @@ else()
 	file(GLOB TERMINAL_SOURCES ./Source/*.cpp) # FIXME: manual selection
 endif()
 
-# Release flags
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g0")
-if (NOT APPLE)
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-s")
-endif()
-
-# Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
-
 # Common flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fvisibility=hidden")
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUNICODE")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
+	#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
 elseif(LINUX)
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
 endif()
 if (NOT BUILD_SHARED_LIBS)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBEARLIBTERMINAL_STATIC_BUILD")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBEARLIBTERMINAL_STATIC_BUILD -DBEARLIBTERMINAL_BUILDING_LIBRARY")
 endif()
 
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -64,21 +59,31 @@ include_directories(./Dependencies/FreeType/Include)
 include_directories(./Dependencies/PicoPNG/Include)
 include_directories(./Dependencies/NanoJPEG/Include)
 
-add_library(BearLibTerminal ${TERMINAL_SOURCES} ${TERMINAL_HEADERS})
+add_library(BearLibTerminal STATIC ${TERMINAL_SOURCES} ${TERMINAL_HEADERS})
 
-target_compile_definitions(BearLibTerminal PRIVATE TERMINAL_VERSION=\"${TERMINAL_VERSION}\")
+target_compile_definitions(BearLibTerminal PUBLIC TERMINAL_VERSION=\"${TERMINAL_VERSION}\")
 
-target_link_libraries(BearLibTerminal freetype2)
-target_link_libraries(BearLibTerminal picopng)
-target_link_libraries(BearLibTerminal ${OPENGL_gl_LIBRARY})
+target_link_libraries(BearLibTerminal PUBLIC freetype2)
+target_link_libraries(BearLibTerminal PUBLIC picopng)
+target_link_libraries(BearLibTerminal PUBLIC ${OPENGL_gl_LIBRARY})
 if(WIN32)
-	target_link_libraries(BearLibTerminal winmm.lib)
-	target_link_libraries(BearLibTerminal ${PROJECT_SOURCE_DIR}/Resource/Terminal-${BITNESS}bit.res)
+	target_link_libraries(BearLibTerminal PUBLIC winmm.lib)
+	target_link_libraries(BearLibTerminal PUBLIC ${PROJECT_SOURCE_DIR}/Resource/Terminal-${BITNESS}bit.res)
 elseif(LINUX)
-	target_link_libraries(BearLibTerminal pthread)
+	target_link_libraries(BearLibTerminal PUBLIC pthread)
 elseif(APPLE)
-	target_link_libraries(BearLibTerminal ${COCOA_LIBRARY})
+	target_link_libraries(BearLibTerminal PUBLIC ${COCOA_LIBRARY})
 endif()
+
+target_compile_definitions(BearLibTerminal PUBLIC BEARLIBTERMINAL_STATIC_BUILD BEARLIBTERMINAL_BUILDING_LIBRARY)
+
+set(MSVC_WARNINGS
+    # /W4 # Baseline reasonable warnings
+    /wd4267
+    /wd4244
+	/wd4066
+)
+target_compile_options(BearLibTerminal PUBLIC ${MSVC_WARNINGS})
 
 set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/Output/${CMAKE_SYSTEM_NAME}${BITNESS})
 set_target_properties(BearLibTerminal PROPERTIES

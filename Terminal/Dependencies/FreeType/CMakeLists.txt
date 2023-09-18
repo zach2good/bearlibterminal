@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.20)
 
 project(freetype2)
 
@@ -22,7 +22,7 @@ include_directories(./Include)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFT2_BUILD_LIBRARY")
 if (UNIX)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC") 
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif()
 
 add_library(freetype2 STATIC ${SOURCES})
