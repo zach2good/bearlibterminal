@@ -27,8 +27,9 @@
 // Also, gl.h in windows is a bit outdated
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
-#include <GL/gl.h>
 #include <windows.h>
+
+#include <GL/gl.h>
 #undef LoadBitmap // There is a function with same name in WinAPI
 // OpenGL 1.2+
 #define GL_BGRA 0x80E1

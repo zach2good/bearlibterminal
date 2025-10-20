@@ -36,8 +36,10 @@
 
 #include <clocale>
 #include <cmath>
+#include <chrono>
 #include <future>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 // Internal usage
