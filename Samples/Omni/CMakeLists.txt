@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 if (UNIX AND NOT APPLE)
 	set(LINUX TRUE)
@@ -60,3 +60,10 @@ endif()
 
 set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/Output/${CMAKE_SYSTEM_NAME}${BITNESS})
 set_target_properties(SampleOmni PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+# Copy Media folder to output directory after build
+add_custom_command(TARGET SampleOmni POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Media
+    $<TARGET_FILE_DIR:SampleOmni>/Media
+    COMMENT "Copying Media folder to output directory")
