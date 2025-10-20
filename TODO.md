@@ -11,3 +11,7 @@
 - SDL3Renderer: Build for emscripten.
 - SDL3GPU: Basic shader support for terminal framebuffer.
 - Add GitHub tagging and releasing workflow.
+- Address all FIXME's.
+- Address all TODO's.
+- Address all XXX's.
+- Build with sensible warnings, warnings-as-errors, and compiler flags.
