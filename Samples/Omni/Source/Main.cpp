@@ -66,8 +66,8 @@ int main()
         { "Formatted log", TestFormattedLog },
         { "Layers", TestLayers },
         { "Extended 1: basics", TestExtendedBasics },
-        //{"Extended 2: inter-layer animation", TestExtendedInterlayer},
-        { "Extended 2: smooth scroll", TestExtendedSmoothScroll },
+        { "Extended 2: inter-layer animation", TestExtendedInterlayer }, // TODO: Does this work?
+        { "Extended 3: smooth scroll", TestExtendedSmoothScroll },
         { "Dynamic sprites", TestDynamicSprites },
         { "Speed", TestSpeed },
         { "Input 1: keyboard", TestKeyboard },
