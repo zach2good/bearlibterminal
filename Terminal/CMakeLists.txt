@@ -11,6 +11,56 @@ option(BUILD_SHARED_LIBS "Build dynamic version of library" ON)
 add_subdirectory(Dependencies/FreeType)
 add_subdirectory(Dependencies/PicoPNG)
 
+CPMAddPackage(
+    NAME SDL3
+    VERSION 3.2.24
+    URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.24/SDL3-devel-3.2.24-VC.zip
+    DOWNLOAD_ONLY YES
+)
+
+if(SDL3_ADDED)
+    set(SDL3_INCLUDE_DIR ${SDL3_SOURCE_DIR}/include)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(SDL3_LIBRARY_DIR ${SDL3_SOURCE_DIR}/lib/x64)
+    else()
+        set(SDL3_LIBRARY_DIR ${SDL3_SOURCE_DIR}/lib/x86)
+    endif()
+    
+    add_library(SDL3::SDL3 SHARED IMPORTED)
+    set_target_properties(SDL3::SDL3 PROPERTIES
+        IMPORTED_LOCATION ${SDL3_LIBRARY_DIR}/SDL3.dll
+        IMPORTED_IMPLIB ${SDL3_LIBRARY_DIR}/SDL3.lib
+        INTERFACE_INCLUDE_DIRECTORIES ${SDL3_INCLUDE_DIR}
+    )
+endif()
+
+CPMAddPackage(
+    NAME imgui
+    VERSION 1.92.4
+    GITHUB_REPOSITORY ocornut/imgui
+    GIT_TAG v1.92.4
+    DOWNLOAD_ONLY YES
+)
+
+if(imgui_ADDED)
+    set(IMGUI_SOURCES
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+		${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+		${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+    
+    add_library(imgui STATIC ${IMGUI_SOURCES})
+    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+    
+	target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR}/backends)
+	target_link_libraries(imgui SDL3::SDL3)
+	target_link_libraries(imgui ${OPENGL_gl_LIBRARY})
+endif()
+
 project(BearLibTerminal)
 
 if(EXISTS "../CHANGELOG.md")
@@ -75,6 +125,10 @@ elseif(APPLE)
 	target_link_libraries(BearLibTerminal ${COCOA_LIBRARY})
 endif()
 
+target_link_libraries(BearLibTerminal SDL3::SDL3)
+
+target_link_libraries(BearLibTerminal imgui)
+
 set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/Output/${CMAKE_SYSTEM_NAME}${BITNESS})
 set_target_properties(BearLibTerminal PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
@@ -88,6 +142,14 @@ if (WIN32)
 		SUFFIX ".dll"
 		IMPORT_PREFIX ""
 		IMPORT_SUFFIX ".lib")
+	
+	set(SDL3_DLL_SOURCE ${SDL3_LIBRARY_DIR}/SDL3.dll)
+	set(SDL3_DLL_DEST $<TARGET_FILE_DIR:BearLibTerminal>/SDL3.dll)
+	add_custom_command(TARGET BearLibTerminal POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${SDL3_DLL_SOURCE} ${SDL3_DLL_DEST}
+		COMMENT "Copying SDL3.dll to executable directory"
+	)
 elseif (APPLE)
 	set_target_properties(BearLibTerminal PROPERTIES
 		BUILD_WITH_INSTALL_RPATH TRUE
