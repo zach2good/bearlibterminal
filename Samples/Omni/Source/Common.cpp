@@ -11,16 +11,16 @@
 #include <windows.h>
 uint64_t GetTime()
 {
-	return timeGetTime();
+    return timeGetTime();
 }
 #endif
 #if defined(__linux) || defined(__APPLE__)
-#include <unistd.h>
 #include <sys/time.h>
+#include <unistd.h>
 uint64_t GetTime()
 {
-	timeval t;
-	gettimeofday(&t, nullptr);
-	return t.tv_sec*1000 + t.tv_usec/1000;
+    timeval t;
+    gettimeofday(&t, nullptr);
+    return t.tv_sec * 1000 + t.tv_usec / 1000;
 }
 #endif

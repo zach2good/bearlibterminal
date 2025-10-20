@@ -9,16 +9,18 @@
 #define COMMON_HPP_
 
 #include "BearLibTerminal.h"
-#include <stdint.h>
+
+#include <cstdint>
 #include <sstream>
 
 uint64_t GetTime();
 
-template<typename T> std::string to_string(const T& value)
+template <typename T>
+std::string to_string(const T& value)
 {
-	std::ostringstream ss;
-	ss << value;
-	return ss.str();
+    std::ostringstream ss;
+    ss << value;
+    return ss.str();
 }
 
 void TestBasicOutput();
